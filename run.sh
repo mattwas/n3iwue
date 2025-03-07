@@ -42,6 +42,6 @@ N3UE_PID=$(pgrep -P ${SUDO_N3UE_PID})
 PID_LIST+=($SUDO_N3UE_PID $N3UE_PID)
 echo N3UE_PID ${N3UE_PID}
 
-trap terminate SIGINT
+trap terminate SIGINT SIGTERM
 wait ${PID_LIST}
 exit 0
