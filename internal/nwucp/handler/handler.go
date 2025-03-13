@@ -11,7 +11,6 @@ import (
 	"github.com/free5gc/n3iwue/internal/gre"
 	"github.com/free5gc/n3iwue/internal/logger"
 	"github.com/free5gc/n3iwue/internal/packet/nasPacket"
-	"github.com/free5gc/n3iwue/internal/rt_table"
 	context "github.com/free5gc/n3iwue/pkg/context"
 	"github.com/free5gc/nas"
 	"github.com/free5gc/nas/nasType"
@@ -60,25 +59,6 @@ func HandleDLNASTransport(n3ueSelf *context.N3UE, nasMsg *nas.Message) {
 
 		newGREName := fmt.Sprintf("%s-id-%d", n3ueSelf.N3ueInfo.GreIfaceName, n3ueSelf.N3ueInfo.XfrmiId)
 
-		custom_rt_table_entry := rt_table.RTTablesEntry{
-			ID:   200,
-			Name: "n3iwue_gre_route",
-		}
-
-		rt_table.CreateRTTablesEntry(&custom_rt_table_entry)
-
-		gre_rule := netlink.NewRule()
-		gre_rule.Src = netlink.NewIPNet(pduAddress)
-		gre_rule.Table = int(custom_rt_table_entry.ID)
-
-		err = netlink.RuleAdd(gre_rule)
-		if err != nil {
-			naslog.Errorf("Failed to add rule: %v", err)
-			return
-		} else {
-			naslog.Infof("Successfully added IP: %s to table ID: %s", pduAddress.String(), gre_rule.String())
-		}
-
 		var linkGREs map[uint8]*netlink.Link
 		if linkGREs, err = gre.SetupGreTunnels(newGREName, n3ueSelf.TemporaryXfrmiName, n3ueSelf.UEInnerAddr.IP,
 			n3ueSelf.TemporaryUPIPAddr, pduAddress, n3ueSelf.TemporaryQosInfo); err != nil {
@@ -116,7 +96,6 @@ func HandleDLNASTransport(n3ueSelf *context.N3UE, nasMsg *nas.Message) {
 					Mask: remoteAddress.Mask,
 				},
 				Priority: priority,
-				Table:    int(custom_rt_table_entry.ID),
 			}
 			if err := netlink.RouteAdd(upRoute); err != nil {
 				naslog.Warnf("netlink.RouteAdd: %+v", err)

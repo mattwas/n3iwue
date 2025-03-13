@@ -121,7 +121,7 @@ type N3IWFInfo struct {
 type N3UEInfo struct {
 	IMSI           IMSI         `yaml:"IMSI" valid:"required"`
 	AMFID          string       `yaml:"AMFID" valid:"hexadecimal,required"`
-	IPSecIfaceName string       `yaml:"IPSecIfaceName" valid:"stringlength(1|10),required"`
+	IPSecIfaceName string       `yaml:"IPSecIfaceName" valid:"stringlength(1|15),required"`
 	IPSecIfaceAddr string       `yaml:"IPSecIfaceAddr" valid:"host,required"`
 	DnIPAddr       string       `yaml:"DnIPAddr" valid:"host,optional"`
 	XfrmiId        uint32       `yaml:"XfrmiId" valid:"numeric,required"`
